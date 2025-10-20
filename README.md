@@ -21,7 +21,7 @@ Episode 26/100 finished in 30 steps.
 
 A plot of total steps for each episode will be shown in the following way:
 
-![Episode vs steps](img/Steps%20vs%20Episode.png)
+![Episode vs steps](img/sarsa_training_progress.png)
 
 ## Dependencies and Versions
 To check your current version of python: type `python --version` in a command window.
@@ -42,10 +42,13 @@ Run the following code to install python packages from `requirements.txt`:
 The core idea of SARSA-learning algorithm is to update action values ($q$-values) in a Temporal-Difference way. 
 
 Difference between Q-learning and SARSA-learning:
+
 As for Q-learning, the next action $a'$ is chosen greedily (max over all possible actions), not necessarily the one actually taken by the current policy.
 
-As for SARSA, the next action is chosen according to the same policy (e.g., ϵ-greedy) that’s used
-for action selection.
+As for SARSA, the next action is chosen according to the same policy (e.g., $\epsilon$-greedy) that’s used
+for action selection. 
+
+From intuition, SARSA is a conservative algorithm comparing to Q-learning. From the movement of the agent, it is obvious that the agent is always moving back and forth is some place that is close to the obstacle. On the contrary, Q-learning is more adventurous, which takes braver actions even the agent is around the obstacles.
 
 Core function of SARSA-learning algorithm:
 

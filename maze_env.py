@@ -89,7 +89,7 @@ class Maze(tk.Tk):
     def reset(self) -> list[float]:
 
         self.update()
-        time.sleep(0.1)
+        time.sleep(0.5)
         self.canvas.delete(self.agent)
         origin = np.array([20, 20])
         self.agent = self._build_rectangle(origin, 'red')
@@ -143,7 +143,7 @@ class Maze(tk.Tk):
         return state_next, reward, done
     
     def render(self):
-        time.sleep(0.01)
+        time.sleep(0.1)
         self.update()
 
 
