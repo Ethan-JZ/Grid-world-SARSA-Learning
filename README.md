@@ -25,8 +25,10 @@ A plot of total steps for each episode will be shown in the following way:
 
 ## Dependencies and Versions
 To check your current version of python: type `python --version` in a command window.
+
 To view your current version of package in python: type `pip show your_package_name` in a command window.
-Run the following line `python -m tkinter` to check if tkinter is installed. If you download python from https://www.python.org/downloads/, usually tkinter is already installed. 
+
+Run the following line `python -m tkinter` to check if `tkinter` is installed. If you download python from https://www.python.org/downloads/, usually tkinter is already installed. 
 
 1. python version: `python 3.13.5`
 2. numpy version: `numpy 2.1.3`
