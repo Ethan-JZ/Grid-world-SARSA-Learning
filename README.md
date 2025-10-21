@@ -1,9 +1,9 @@
 # Implement SARSA learning on a 2D grid world
 
-This project is to use SARSA-learning to let the agent, a red square 🟥, find its target in a simple 2D maze. The black square ⬛️ is an obstacle, which will terminate the movement of the agent once it hits there. The yellow square 🟨 is the target that the agent is trying to search in this 2D maze.
+This project is to use SARSA-learning to let the agent, a red square 🟥, find its target in a simple 2D maze. The black square ⬛️ is an obstacle, which will terminate the movement of the agent once it hits there. The blue square 🟦 is the target that the agent is trying to search in this 2D maze.
 
 ## Environment Setting
-The environment is in a $4 \times 4$ grid world. The red square agent 🟥 moves in 4 actions: `up`, `down`, `right` and `left`. If the agent hits the black square obstacle ⬛️, a penalty `reward = -1` will be applied. If the agent hits the target square 🟨, a `reward = 1` will be applied. Otherwise, the agent get `reward = 0`. If the agent hit the boundary, it will stays at the current state. 
+The environment is in a $4 \times 4$ grid world. The red square agent 🟥 moves in 4 actions: `up`, `down`, `right` and `left`. If the agent hits the black square obstacle ⬛️, a penalty `reward = -1` will be applied. If the agent hits the target square 🟦, a `reward = 1` will be applied. Otherwise, the agent get `reward = 0`. If the agent hit the boundary, it will stays at the current state. 
 
 ![Environment setting](img/env.png)
 
@@ -13,7 +13,7 @@ Please turn to his course if you speak fluent Chinese for more thoughtful unders
 
 ## What are expected in the output
 
-After several episodes, you are expected to see the following agent movement for each step, from start to the target 🟨. But also there are a lot of episodes that the agent fails to get the the target and hit the obstacles.
+After several episodes, you are expected to see the following agent movement for each step, from start to the target 🟦. But also there are a lot of episodes that the agent fails to get the the target and hit the obstacles.
 
 ![Movement in env](img/animation.gif)
 
@@ -114,3 +114,11 @@ A remark to remember is that the agent moves in `tkinter` environment with `self
 ### Main loop of SARSA-learning 
 
 ![Main loop of SARSA learning](img/sarsa_learning_alg.png)
+
+## SARAS-lambda-learning Algorithm
+
+From previous experiment, it is obvious that Sarsa is updating really slow. This is because every time when Sarsa is updating, only the last state next to the terminal state will be considered. 
+
+What if we modify the algorithm a bit, mark each state with an eligibity trace, if the state is closer to the target, we mark it with higher eligibility trace, but also the eligibility will decay through steps with a factor. States that are more important than others will be marked more times than states that are less important. 
+
+Based on this idea, we have a parameter $\lambda$. Basic Sarsa algorithm can be called Sarsa(0), which only updates the last state next to the target state. If $\lambda=1$, then the algorithm becomes Sarsa(1), which marks every state along the route from start to the target. $0<\lambda<1$, is marking states with a importance rank, state that is closer to the target gets more attention, vice versa.  

@@ -11,6 +11,7 @@ class RLModel:
         self.epsilon = epsilon              # epsilon greedy factor
 
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)  # pandas data frame with columns index being actions' names
+        self.eligibility_trace = None  # only used by sarsa lambda table
 
     def choose_action(self, state: str) -> str:
         """
@@ -53,6 +54,11 @@ class RLModel:
             # concat the row to the q table
             self.q_table = pd.concat([self.q_table, new_row.to_frame().T])
 
+            # add to eligibility trace if needed
+            if self.eligibility_trace is not None:
+                self.eligibility_trace = pd.concat([self.eligibility_trace, new_row.to_frame().T])
+    
+
 class QLearningTable(RLModel):
 
     def __init__(self, actions: list, learning_rate: float=0.01, gamma: float=0.9, epsilon: float=0.9):
@@ -73,12 +79,24 @@ class QLearningTable(RLModel):
         self.q_table.loc[state, action] += self.learning_rate * (q_target - q_estimate)
 
 
-
 class SarsaTable(RLModel):
+    """
+    One step sarsa, update for the final step reaching the target, Sarsa(0)
+    """
     def __init__(self, actions: list, learning_rate: float=0.01, gamma: float=0.9, epsilon: float=0.9):
         super().__init__(actions, learning_rate, gamma, epsilon)
 
     def learn(self, state: str, action: str, reward: float, state_next: str, action_next: str):
+        """
+        Sarsa to update Q(s, a) based on s, a, r, s', a'
+        state: current state s
+        action: current action a
+        reward: immediate reward r
+        state_next: next state s'
+        action_next: next action a'
+
+        update Q(s, a) = Q(s, a) + alpha * (r + gamma * Q(s', a') - Q(s, a))
+        """
         
         # check if the next state is in our q table
         self.check_state_exist(state_next)  
@@ -91,3 +109,46 @@ class SarsaTable(RLModel):
         
         # update Q(s, a)
         self.q_table.loc[state, action] += self.learning_rate * (q_target - q_estimate)
+
+
+class SarsaLambdaTable(RLModel):
+    """
+    One step sarsa, update for the final step reaching the target, Sarsa(0)
+    """
+    def __init__(self, actions: list, learning_rate: float=0.01, gamma: float=0.9, epsilon: float=0.9, trace_decay: float=0.9):
+        super().__init__(actions, learning_rate, gamma, epsilon)
+
+        self.lambda_ = trace_decay
+        self.eligibility_trace = pd.DataFrame(columns=self.actions, dtype=np.float64)
+
+    def learn(self, state: str, action: str, reward: float, state_next: str, action_next: str):
+        """
+        Sarsa to update Q(s, a) based on s, a, r, s', a'
+        state: current state s
+        action: current action a
+        reward: immediate reward r
+        state_next: next state s'
+        action_next: next action a'
+
+        update Q(s, a) = Q(s, a) + alpha * (r + gamma * Q(s', a') - Q(s, a))
+        """
+        
+        # check if the next state is in our q table
+        self.check_state_exist(state_next)  
+        q_estimate = self.q_table.loc[state, action]
+
+        if state_next != 'terminal':
+            q_target = reward + self.gamma * self.q_table.loc[state_next, action_next]
+        else:
+            q_target = reward # next state is terminal
+        
+        # check if the state is necessary, if it is necessay, we replace it with 1
+        TD_error = q_target - q_estimate
+        self.eligibility_trace.loc[state, :] *= 0
+        self.eligibility_trace.loc[state, action] = 1
+        
+        # update Q(s, a)
+        self.q_table += self.learning_rate * TD_error * self.eligibility_trace
+
+        # decay eligibility trace after update
+        self.eligibility_trace *= self.gamma * self.lambda_
